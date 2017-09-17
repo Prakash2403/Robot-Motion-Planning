@@ -15,8 +15,9 @@ def update_heading(robot_obj, rotation, movement):
 
 
 def decimal_wall_num(robot_obj, sensors, down):
+    sensors.append(down)
     return wall_conversion_matrix_dict[robot_obj.heading] * \
-           (np.asmatrix([sensors[0], sensors[1], sensors[2], down]).transpose())
+           (np.asmatrix(sensors).transpose())
 
 
 def binarize_sensor_data(sensors):
@@ -88,6 +89,7 @@ def find_optimal_move(robot_obj, x1, y1, sensors):
 
             #  Make sure robot next space is in maze
             if 0 <= x2 < robot_obj.maze_dim and 0 <= y2 < robot_obj.maze_dim:
+                #  Preventing robot from entering into a path which leads to a dead end.
                 if robot_obj.traversal_grid[x2][y2] != DEAD_END:
                     f_cost = robot_obj.traversal_grid[x2][y2]
                     h_cost = robot_obj.manhattan_heuristic_grid[x2][y2]
@@ -97,6 +99,7 @@ def find_optimal_move(robot_obj, x1, y1, sensors):
                     # If there is a tie, then we will sort them w.r.t. h_cost or heuristic value.
                     # Details are discussed in Project Report.
                     possible_moves.append([f_cost, h_cost, x2, y2, sensor])
+                    #  Dead end path detection
                 if robot_obj.traversal_grid[x2][y2] == DEAD_END and np.count_nonzero(sensors) == 1:
                     robot_obj.traversal_grid[x1][y1] = DEAD_END
 
@@ -110,16 +113,17 @@ def find_optimal_move(robot_obj, x1, y1, sensors):
     return rotate[sensor], 1
 
 
-def flood_fill(robot_obj, goal):
-    #  Dynamic Programming or Flood fill algorithm
-    #  This block of code is mostly taken from  Udacity's AI for Robotics course
+def shortest_path(robot_obj, goal):
+    #  Dynamic Programming algorithm
+    #  Some of the code in this block is taken from  Udacity's AI for Robotics course
     #  https://www.udacity.com/course/artificial-intelligence-for-robotics--cs373
+    #  Inspired by maze solving algorithm given on
+    #  http://www.micromouseonline.com/micromouse-book/mazes-and-maze-solving/solving-the-maze/
 
     change = True  # Initialize boolean to start while-loop
 
     while change:
         change = False
-
         for x in range(robot_obj.maze_dim):
             for y in range(robot_obj.maze_dim):
                 if goal[0] == x and goal[1] == y:
@@ -131,7 +135,7 @@ def flood_fill(robot_obj, goal):
                 else:
                     wall = robot_obj.wall_map[x][y]
                     binary_wall = "{0:04b}".format(wall)
-                    # Flood fill algorithm. Discussed briefly in project report.
+                    # Dynamic Programming. Discussed briefly in project report.
                     for direction in range(len(delta)):
                         if binary_wall[direction] == '1':
                             new_x_coordinate = x + delta[direction][0]

@@ -39,7 +39,7 @@ def exploration_trial(robot_obj, sensors):
 
     elif robot_obj.goal_discovered and discovered >= robot_obj.exploration_percent:
         print("Robot has ended exploration after {} steps. Starting Optimization trial".format(robot_obj.step_count))
-        utils.flood_fill(robot_obj, robot_obj.goals)  # Compute the value function and find optimal path
+        utils.shortest_path(robot_obj, robot_obj.goals)  # Compute the value function and find optimal path
         print('Wall map')
         print(robot_obj.wall_map)
         print('Traversal Grid')
