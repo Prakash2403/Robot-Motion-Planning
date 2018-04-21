@@ -16,7 +16,7 @@ def optimization_trial(robot_obj):
         rotation = 90
     elif rotation == 270:
         rotation = -90
-    direction = sensors_direction_dict[robot_obj.heading][rotation / 90 + 1]  # Change direction
+    direction = sensors_direction_dict[robot_obj.heading][rotation // 90 + 1]  # Change direction
 
     # Move up to 3 consecutive steps
     while movement < 3:  # Limit movement to 3 spaces
